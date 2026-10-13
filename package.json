@@ -1,0 +1,103 @@
+{
+  "name": "coway-ic-checker",
+  "version": "1.0.0",
+  "description": "Coway eTRUST IC Checker desktop application",
+  "main": "src/main.js",
+  "author": "Coway IC Checker",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "rebuild": "electron-rebuild -f -w playwright",
+    "postinstall": "node tools/install-browser.js",
+    "predist:win": "node tools/install-browser.js",
+    "predist:win-arm64": "node tools/install-browser.js",
+    "predist:mac": "node tools/install-browser.js",
+    "predist:mac-intel": "node tools/install-browser.js",
+    "dist:win": "electron-builder --win --x64",
+    "dist:win-arm64": "electron-builder --win --arm64",
+    "dist:mac": "electron-builder --mac dmg zip --arm64",
+    "dist:mac-intel": "electron-builder --mac dmg zip --x64",
+    "license:30": "node tools/generate-license.js 30",
+    "license:90": "node tools/generate-license.js 90",
+    "license:365": "node tools/generate-license.js 365",
+    "admin:keygen": "node tools/generate-keypair.js",
+    "admin:keypair": "node tools/generate-keypair.js",
+    "admin:license": "node tools/generate-license.js",
+    "dist:mac-all": "electron-builder --mac dmg zip --x64 --arm64"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "playwright": "^1.55.0"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^4.0.1",
+    "electron": "^38.0.0",
+    "electron-builder": "^26.0.0"
+  },
+  "build": {
+    "appId": "com.coway.icchecker",
+    "productName": "Coway IC Checker",
+    "asar": true,
+    "files": [
+      "src/**/*",
+      "package.json",
+      "!node_modules/playwright-core/.local-browsers/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "node_modules/playwright-core/.local-browsers",
+        "to": "playwright-browsers",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "mac": {
+      "icon": "build/icon.png",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "category": "public.app-category.business",
+      "hardenedRuntime": true
+    }
+  }
+}
