@@ -372,9 +372,23 @@ async function runChecker(inputFile, outputPath) {
   // PLAYWRIGHT_BROWSERS_PATH is already set (see top of file, before the
   // playwright import) for packaged builds. Development builds fall back
   // to the normal Playwright browser cache in that user's home folder.
-  const browser = await chromium.launch({
-    headless: false
-  });
+  const browserOptions = { headless: false };
+  if (app.isPackaged) {
+    // Prefer the browser installed in the application's resources directory.
+    // Fail with a diagnostic instead of displaying Playwright's misleading
+    // instruction to run npm/npx on the customer's machine.
+    const browserPath = chromium.executablePath();
+    const browserRoot = path.join(process.resourcesPath, "playwright-browsers");
+    if (!fs.existsSync(browserPath)) {
+      throw new Error(
+        "Bundled Chromium was not found. Expected: " + browserPath +
+        "\\nBrowser resources directory: " + browserRoot +
+        "\\nPlease reinstall the latest Coway IC Checker build."
+      );
+    }
+    browserOptions.executablePath = browserPath;
+  }
+  const browser = await chromium.launch(browserOptions);
 
   const page = await browser.newPage();
 
